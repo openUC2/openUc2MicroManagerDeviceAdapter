@@ -640,7 +640,7 @@ int XYStage::SyncState()
 {
 	// Query for the current position [x y z] of the stage
 	// Query for the current position [x y z] of the stage
-	std::string cmd = R'({"task": "/motor_get"})";
+	std::string cmd = "({'task': '/motor_get'})";
 	/*
 	returns:
 	{
@@ -759,7 +759,7 @@ int ZStage::Initialize()
 int ZStage::Shutdown()
 {
 	// De-energize the motors
-	std::string cmd = '{"task":"/motor_act", "isen":0, "isenauto":1}';
+	std::string cmd = "{'task':' / motor_act', 'isen':0, 'isenauto':1}";
 	pHub->SendCommand(cmd, _serial_answer);
 	initialized_ = false;
 	return DEVICE_OK;
@@ -779,7 +779,7 @@ int ZStage::GetPositionSteps(long &steps)
 
 int ZStage::SetRelativePositionUm(double d)
 {
-	SetRelativePositionUm(double d) long dSteps = nint(d / stepSizeUm_);
+	long dSteps = nint(d / stepSizeUm_);
 	int ret = SetRelativePositionSteps(dSteps); // Stage starts moving after this step
 
 	if (ret == DEVICE_OK)
@@ -794,11 +794,11 @@ int ZStage::SetRelativePositionUm(double d)
 int ZStage::SetRelativePositionSteps(long z)
 {
 	// Concatenate the command and number of steps
-	// {"task": "/motor_act", "motor": {"steppers": [{"stepperid": 3, "position": -10000, "speed": 20000, "isabs": 0, "isaccel": 1, "accel":20000, "isen": true}]}}
-	std::String cmd = '{"task": "/motor_act", "motor": {"steppers": [{"stepperid": 3, "position": ' + std::to_string(z) + ', "speed": 20000, "isabs": 0, "isaccel": 1, "accel":20000, "isen": true}]}';
+	// {'task": "/motor_act", "motor": {"steppers": [{"stepperid": 3, "position": -10000, "speed": 20000, "isabs": 0, "isaccel": 1, "accel":20000, "isen": true}]}}
+	std::string cmd = "{'task': '/motor_act', 'motor' : {'steppers': [{'stepperid': 3, 'position' : ' + std::to_string(z) + ', 'speed' : 20000, 'isabs' : 0, 'isaccel' : 1, 'accel' : 20000, 'isen' : true}] }";
 
 	// Send command through hub
-	int ret = pHub->SendCommand(cmd.str(), _serial_answer);
+	int ret = pHub->SendCommand(cmd, _serial_answer);
 
 	// TODO: I think we need to accumulate steps to stepsZ_ here - but not if um is called..
 	return ret;
@@ -807,7 +807,7 @@ int ZStage::SetRelativePositionSteps(long z)
 int ZStage::SetOrigin()
 {
 	// Set current position as origin (all motor positions set to 0)
-	std::string cmd = '{"task": "/motor_act", "setpos": {"steppers": [{"stepperid": 3, "posval": 0}]}}'; // TODO: Do Not hardcode!
+	std::string cmd = "{'task': '/motor_act', 'setpos' : {'steppers': [{'stepperid': 3, 'posval' : 0}] }}"; // TODO: Do Not hardcode!
 	int ret = pHub->SendCommand(cmd, _serial_answer);
 	return ret;
 }
@@ -827,7 +827,7 @@ void ZStage::GetName(char *name) const
 int ZStage::SyncState()
 {
 	// Query for the current position [x y z] of the stage
-	std::string cmd = R"({"task": "/motor_get"})";
+	std::string cmd = "({'task: '/motor_get'})";
 	/*
 	returns:
 	{
@@ -958,7 +958,7 @@ int LEDIllumination::SetOpen(bool open) // bool open = true)
 	}
 	else
 	{
-		std::string cmd = '{"task":"/laser_act", "LASERid":1, "LASERval":0}'; // TODO: Why this and not just setBrightness?
+		std::string cmd = "{'task':'/laser_act', 'LASERid':1, 'LASERval':0}"; // TODO: Why this and not just setBrightness?
 		pHub->SendCommand(cmd, _serial_answer);
 	}
 
@@ -1049,7 +1049,7 @@ int LEDIllumination::SyncState()
 							"LASER2val":0,
 							"LASER3val":0}}
 	*/
-	std::string cmd = '{"task":"/laser_get"}';
+	std::string cmd = "{'task':'/laser_get'}";
 	pHub->SendCommand(cmd, _serial_answer); // Output is something like CC LED:1.00, so i can't use hub's ExtractNumber()
 
 	// Find the position of the numeric value in the response
@@ -1081,7 +1081,7 @@ int LEDIllumination::SetBrightness()
 {
 	// actually send command to set brightness of the LedArray
 	// {"task":"/laser_act", "LASERid":1, "LASERval":1000}
-	std::string cmd = '{"task":"/laser_act", "LASERid":1, "LASERval:"' + std::to_string(brightness_) + '}';
+	std::string cmd = "{'task':'/laser_act', 'LASERid':1, 'LASERval:'" + std::to_string(brightness_) + "}";
 	pHub->SendCommand(cmd, _serial_answer);
 
 	return DEVICE_OK;

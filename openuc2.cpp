@@ -495,7 +495,7 @@ int XYStage::Initialize()
 int XYStage::Shutdown()
 {
 	// De-energize the motors
-	std::string cmd = '{"task":"/motor_act", "isen":0, "isenauto":1}';
+	std::string cmd = "{'task':'/motor_act', 'isen' : 0, 'isenauto : 1}";
 	pHub->SendCommand(cmd, _serial_answer);
 	initialized_ = false;
 	return DEVICE_OK;
@@ -552,9 +552,9 @@ int XYStage::SetRelativePositionSteps(long x, long y)
 {
 
 	// Sending two commands sequentially
-	std::String cmd = '{"task": "/motor_act", "motor": {"steppers": [{"stepperid": 1, "position": ' + std::to_string(x) + ', "speed": 20000, "isabs": 0, "isaccel": 1, "accel":20000, "isen": true},{"stepperid": 2, "position": ' + std::to_string(y) + ', "speed": 20000, "isabs": 0, "isaccel": 1, "accel":20000, "isen": true}]}';
+	std::string cmd = "{'task': '/motor_act', 'motor' : {'steppers': [{'stepperid': 1, 'position' : " + std::to_string(x) + ", 'speed' : 20000, 'isabs' : 0, 'isaccel' : 1, 'accel' : 20000, 'isen' : true }, {'stepperid': 2, 'position' : " + std::to_string(y) + "', 'speed': 20000, 'isabs': 0, 'isaccel': 1, 'accel':20000, 'isen': true}]}";
 	
-	int ret = pHub->SendCommand(cmd.str(), _serial_answer);
+	int ret = pHub->SendCommand(cmd, _serial_answer);
 
 	return ret;
 }
@@ -563,7 +563,7 @@ int XYStage::SetOrigin()
 {
 
 	// Set current position as origin (all motor positions set to 0)
-	std::string cmd = '{"task": "/motor_act", "setpos": {"steppers": [{"stepperid": 1, "posval": 0}, {"stepperid":2, "posval":0}]}}'; // TODO: Do Not hardcode!
+	std::string cmd = "{'task': '/motor_act', 'setpos' : {'steppers': [{'stepperid': 1, 'posval' : 0}, {'stepperid':2, 'posval' : 0}] }}"; // TODO: Do Not hardcode!
 	int ret = pHub->SendCommand(cmd, _serial_answer);
 
 	return ret;
@@ -581,10 +581,10 @@ int XYStage::SetAdapterOrigin()
 int XYStage::Home()
 {
 	// TODO: Change this from hard-coded values into something else
-	// {"task":"/home_act", "home": {"steppers": [{"stepperid":1, "timeout": 20000, "speed": 20000, "direction":-1, "endstoppolarity":0}]}}
-	std::string cmd = '{"task":"/home_act", "home": {"steppers": [{"stepperid":1, "timeout": 20000, "speed": 20000, "direction":-1, "endstoppolarity":0}]}';
+	// {'task":"/home_act", "home": {"steppers": [{"stepperid":1, "timeout": 20000, "speed": 20000, "direction":-1, "endstoppolarity":0}]}}
+	std::string cmd = "{'task':'/home_act', 'home' : {'steppers': [{'stepperid':1, 'timeout' : 20000, 'speed' : 20000, 'direction' : -1, 'endstoppolarity' : 0}] }";
 	pHub->SendCommand(cmd, _serial_answer);
-	std::string cmd = '{"task":"/home_act", "home": {"steppers": [{"stepperid":2, "timeout": 20000, "speed": 20000, "direction":-1, "endstoppolarity":0}]}';
+	std::string cmd = "{'task':'/home_act', 'home' : {'steppers': [{'stepperid':2, 'timeout' : 20000, 'speed' : 20000, 'direction' : -1, 'endstoppolarity' : 0}] }";
 	pHub->SendCommand(cmd, _serial_answer);
 
 	return DEVICE_OK;
@@ -605,7 +605,7 @@ int XYStage::Stop()
         ]
     }
 	}	*/
-	std::string cmd = '{"task":"/motor_act","motor":{"steppers":[{"stepperid":1,"isstop":True}]}}';
+	std::string cmd = "{'task':'/motor_act', 'motor' : {'steppers': [{'stepperid':1, 'isstop' : True}] }}";
 	pHub->SendCommand(cmd, _serial_answer);
 
 	// Make sure current position is synched
@@ -640,7 +640,7 @@ int XYStage::SyncState()
 {
 	// Query for the current position [x y z] of the stage
 	// Query for the current position [x y z] of the stage
-	std::string cmd = R"({"task": "/motor_get"})";
+	std::string cmd = R'({"task": "/motor_get"})";
 	/*
 	returns:
 	{

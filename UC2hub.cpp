@@ -1,3 +1,4 @@
+
 #include "openUC2.h"
 #include "UC2Hub.h"
 #include "ModuleInterface.h"
@@ -105,7 +106,7 @@ int UC2Hub::OnPort(MM::PropertyBase* pProp, MM::ActionType eAct)
 
 bool UC2Hub::CheckFirmware()
 {
-   // Minimal example: 
+   // Minimal example:
    std::string cmd = R"({"task":"/state_get"})";
    std::string reply;
    int ret = SendJsonCommand(cmd, reply, false);
@@ -130,7 +131,7 @@ int UC2Hub::SendJsonCommand(const std::string& jsonCmd, std::string& jsonReply, 
       return ret;
 
    // 2) Send
-   ret = SendSerialCommand(port_.c_str(), jsonCmd.c_str(), "\n"); 
+   ret = SendSerialCommand(port_.c_str(), jsonCmd.c_str(), "\n");
    if (ret != DEVICE_OK)
       return ret;
 

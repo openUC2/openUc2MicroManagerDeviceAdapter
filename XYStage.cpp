@@ -1,9 +1,10 @@
+
 #include "XYStage.h"
 #include "UC2Hub.h"
 #include "ModuleInterface.h"
 #include <sstream>
 
-XYStage::XYStage() : 
+XYStage::XYStage() :
    initialized_(false),
    hub_(nullptr),
    stepSizeUm_(0.05),
@@ -20,13 +21,13 @@ XYStage::~XYStage()
 
 int XYStage::Initialize()
 {
-   if (initialized_) 
+   if (initialized_)
       return DEVICE_OK;
 
    // Get pointer to our hub
    hub_ = dynamic_cast<UC2Hub*>(GetParentHub());
    if (!hub_) {
-      return ERR_NO_PORT_SET; 
+      return ERR_NO_PORT_SET;
    }
 
    // set property list if needed (speed, acceleration, etc.)
@@ -52,7 +53,7 @@ bool XYStage::Busy()
 
 int XYStage::SetPositionUm(double x, double y)
 {
-   if (!initialized_) 
+   if (!initialized_)
       return DEVICE_NOT_CONNECTED;
 
    // Convert to steps if needed
@@ -69,7 +70,7 @@ int XYStage::SetPositionUm(double x, double y)
    std::string cmd = ss.str();
    std::string reply;
    int ret = hub_->SendJsonCommand(cmd, reply, false);
-   if (ret != DEVICE_OK) 
+   if (ret != DEVICE_OK)
       return ret;
 
    // If success, update cached positions

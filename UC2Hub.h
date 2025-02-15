@@ -1,6 +1,7 @@
 #ifndef _UC2HUB_H_
 #define _UC2HUB_H_
 
+
 #include "MMDevice.h"
 #include "DeviceBase.h"
 #include <string>

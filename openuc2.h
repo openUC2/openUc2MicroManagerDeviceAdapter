@@ -1,6 +1,7 @@
 #ifndef _OPENUC2_H_
 #define _OPENUC2_H_
 
+
 #include "MMDevice.h"
 #include "DeviceBase.h"
 #include <string>

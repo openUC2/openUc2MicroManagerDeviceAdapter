@@ -1,6 +1,7 @@
 #ifndef _OPENUC2_SHUTTER_H_
 #define _OPENUC2_SHUTTER_H_
 
+
 #include "DeviceBase.h"
 #include "openUC2.h"
 #include <string>

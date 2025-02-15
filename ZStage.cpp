@@ -1,4 +1,3 @@
-
 #include "ZStage.h"
 #include "UC2Hub.h"
 #include <sstream>
@@ -6,8 +5,8 @@
 ZStage::ZStage() :
    initialized_(false),
    hub_(nullptr),
-   stepSizeUm_(0.1),
-   posZ_(0.0)
+   posZSteps_(0),
+   stepSizeUm_(0.1) // example: 0.1 µm per step
 {
 }
 
@@ -25,8 +24,6 @@ int ZStage::Initialize()
    if (!hub_)
       return ERR_NO_PORT_SET;
 
-   // Possibly create properties for speed, acceleration, etc.
-
    initialized_ = true;
    return DEVICE_OK;
 }
@@ -37,42 +34,97 @@ int ZStage::Shutdown()
    return DEVICE_OK;
 }
 
+void ZStage::GetName(char* name) const
+{
+   CDeviceUtils::CopyLimitedString(name, g_ZStageName);
+}
+
 bool ZStage::Busy()
 {
-   // Query if needed
    return false;
+}
+
+int ZStage::SetPositionSteps(long steps)
+{
+   if (!initialized_) return DEVICE_NOT_CONNECTED;
+
+   // Example JSON command for an absolute Z move (assume stepperid 3)
+   std::ostringstream ss;
+   ss << R"({"task":"/motor_act","motor":{"steppers":[)"
+      << R"({"stepperid":3,"position":)" << steps << R"(,"speed":2000,"isabs":1})"
+      << "]}}";
+
+   std::string reply;
+   int ret = hub_->SendJsonCommand(ss.str(), reply);
+   if (ret != DEVICE_OK)
+      return ret;
+
+   posZSteps_ = steps;
+   return DEVICE_OK;
+}
+
+int ZStage::GetPositionSteps(long& steps)
+{
+   if (!initialized_) return DEVICE_NOT_CONNECTED;
+   steps = posZSteps_;
+   return DEVICE_OK;
+}
+
+// Additional helper; not declared in base so remove 'override'
+int ZStage::SetRelativePositionSteps(long steps)
+{
+   return SetPositionSteps(posZSteps_ + steps);
+}
+
+int ZStage::Home()
+{
+   // If the hardware supports homing, send the command; otherwise, zero the cached position.
+   posZSteps_ = 0;
+   return DEVICE_OK;
+}
+
+int ZStage::Stop()
+{
+   return DEVICE_OK;
+}
+
+int ZStage::GetLimits(double& min, double& max)
+{
+   min = 0.0;
+   max = 25000.0; // example: 25,000 µm (25 mm)
+   return DEVICE_OK;
 }
 
 int ZStage::SetPositionUm(double z)
 {
-   if (!initialized_) return DEVICE_NOT_CONNECTED;
-
-   // Example JSON for absolute Z move: stepperid=3, isabs=1
-   long stepsZ = (long)(z / stepSizeUm_);
-
-   std::ostringstream ss;
-   ss << R"({"task":"/motor_act","motor":{"steppers":[)"
-      << R"({"stepperid":3,"position":)" << stepsZ << R"(,"speed":2000,"isabs":1})"
-      << "]}}";
-
-   std::string cmd = ss.str();
-   std::string reply;
-   int ret = hub_->SendJsonCommand(cmd, reply);
-   if (ret != DEVICE_OK)
-      return ret;
-
-   posZ_ = z;
-   return DEVICE_OK;
+   long steps = static_cast<long>(z / stepSizeUm_);
+   return SetPositionSteps(steps);
 }
 
 int ZStage::GetPositionUm(double& z)
 {
-   // Same approach as XY: parse motor_get reply or rely on cached posZ_.
-   z = posZ_;
+   long steps = 0;
+   int ret = GetPositionSteps(steps);
+   if (ret != DEVICE_OK)
+      return ret;
+
+   z = steps * stepSizeUm_;
    return DEVICE_OK;
 }
 
-int ZStage::SetRelativePositionUm(double dz)
+int ZStage::SetOrigin()
 {
-   return SetPositionUm(posZ_ + dz);
+   posZSteps_ = 0;
+   return DEVICE_OK;
+}
+
+int ZStage::IsStageSequenceable(bool& isSequenceable) const
+{
+   isSequenceable = false;
+   return DEVICE_OK;
+}
+
+bool ZStage::IsContinuousFocusDrive() const
+{
+   return false;
 }

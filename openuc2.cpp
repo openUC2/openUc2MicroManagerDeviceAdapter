@@ -1,11 +1,13 @@
-
 #include "openUC2.h"
 #include "UC2Hub.h"
 #include "XYStage.h"
 #include "ZStage.h"
 #include "Shutter.h"
+#include "ModuleInterface.h"
+#include <cstring>
 
-// Required Micro-Manager API:
+// Module API: registers devices for Micro-Manager
+
 MODULE_API void InitializeModuleData()
 {
    RegisterDevice(g_HubName,     MM::HubDevice,    "openUC2 hub device");
@@ -17,7 +19,7 @@ MODULE_API void InitializeModuleData()
 MODULE_API MM::Device* CreateDevice(const char* deviceName)
 {
    if (!deviceName)
-      return nullptr;
+      return 0;
 
    if (strcmp(deviceName, g_HubName) == 0)
       return new UC2Hub();
@@ -28,8 +30,7 @@ MODULE_API MM::Device* CreateDevice(const char* deviceName)
    else if (strcmp(deviceName, g_ShutterName) == 0)
       return new UC2Shutter();
 
-   // Unknown device
-   return nullptr;
+   return 0;
 }
 
 MODULE_API void DeleteDevice(MM::Device* pDevice)

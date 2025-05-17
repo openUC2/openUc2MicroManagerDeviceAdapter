@@ -5,6 +5,14 @@
 #include "openUC2.h"
 #include <string>
 
+
+
+//////////////////////////////////////////////////
+///                                            ///
+///	Developped by Christian Karras, April 2025 ///
+///                                            ///
+//////////////////////////////////////////////////
+
 class UC2Hub;
 
 class ZStage : public CStageBase<ZStage>
@@ -35,13 +43,23 @@ public:
    int SetOrigin() override;
    int IsStageSequenceable(bool& isSequenceable) const override;
    bool IsContinuousFocusDrive() const override;
+   int OnSpeedZ(MM::PropertyBase* pProp, MM::ActionType eAct);
+
+   int OnHomeSpeedZ(MM::PropertyBase* pProp, MM::ActionType eAct);
+   int OnHomePolarityZ(MM::PropertyBase* pProp, MM::ActionType eAct);
+   int OnHomeDirectionZ(MM::PropertyBase* pProp, MM::ActionType eAct);
+   int OnHomeTimeoutZ(MM::PropertyBase* pProp, MM::ActionType eAct);
+
 
 private:
    bool    initialized_;
    UC2Hub* hub_;
-
-   long    posZSteps_;
-   double  stepSizeUm_;
+   int speedZ_;
+   int homeDirZ_;
+   int homeSpeedZ_;
+   int homePolarityZ_;
+   int homeTimeOutZ_;
+   
 };
 
 #endif
